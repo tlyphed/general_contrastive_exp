@@ -29,8 +29,9 @@ u :- cm1(A,V1), cm1(A,V2), V1 != V2.
 u :- cm1(A,V1), w1(A,V2), V1 != V2.
 
 % cm satisfies fact & -foil -> saturate
-fact_cl_sat(C) :- fact_cl(C), lit(C,A,V), w1(A,V).
-foil_cl_viol(C) :- foil_cl(C), not w1(A,V) : lit(C,A,V).
+fact_cl_sat(C) :- fact_cl(C), lit(C,A,V), cm1(A,V).
+foil_cl_viol(C) :- foil_cl(C), cm1(A,f) : lit(C,A,t);
+                               cm1(A,t) : lit(C,A,f).
 
 fact_sat :- fact_cl_sat(C) : fact_cl(C).
 foil_viol :- foil_cl_viol(C).
@@ -60,8 +61,9 @@ v :- cm2(A,V1), w2(A,V2), V1 != V2.
 v :- cm2(A,V1), w2(A,V2), V1 != V2.
 
 % cm satisfies -fact & foil -> saturate
-foil_cl_sat(C) :- foil_cl(C), lit(C,A,V), w2(A,V).
-fact_cl_viol(C) :- fact_cl(C), not w2(A,V) : lit(C,A,V).
+foil_cl_sat(C) :- foil_cl(C), lit(C,A,V), cm2(A,V).
+fact_cl_viol(C) :- fact_cl(C), cm2(A,f) : lit(C,A,t);
+                               cm2(A,t) : lit(C,A,f).
 
 foil_sat :- foil_cl_sat(C) : foil_cl(C).
 fact_viol :- fact_cl_viol(C).
@@ -88,3 +90,4 @@ flip(A) :- s''(A,V1), s'(A,V2), V1!=V2.
 
 #show s'/2.
 #show s''/2.
+% #show t/2.
