@@ -131,7 +131,8 @@ cm2(A,f) :- v, atom(A).
 % size
 :~ theta_lit(C,A,V). [1@2,C,A,theta]
 :~ theta'_lit(C,A,V). [1@2,C,A,theta']
-:~ chi_lit(C,A,V). [1@2,C,A,chi]
+% :~ chi_lit(C,A,V). [1@2,C,A,chi]
+:~ chi_lit(C,A,V). [2@2,C,A,chi]
 :~ chi_lit(C,A,V). [-1@1,C,A,chi]
 
 
