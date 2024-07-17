@@ -15,6 +15,10 @@ theta_cl_empty(C) :- theta_cl(C), not theta_lit(C,_,_).
 theta'_cl_empty(C) :- theta'_cl(C), not theta'_lit(C,_,_).
 chi_cl_empty(C) :- chi_cl(C), not chi_lit(C,_,_).
 
+:- theta_cl_empty(C1), theta_cl(C2), C2 > C1, theta_lit(C2,_,_).
+:- theta'_cl_empty(C1), theta'_cl(C2), C2 > C1, theta'_lit(C2,_,_).
+:- chi_cl_empty(C1), chi_cl(C2), C2 > C1, chi_lit(C2,_,_).
+
 % theta & chi equiv fact & -foil
 
 % guess countermodel

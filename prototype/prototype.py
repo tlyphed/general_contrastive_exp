@@ -76,7 +76,7 @@ def __parse_answer_set(answer_set):
                 chi[c] = []
             chi[c].append((l,s == "t"))
     
-    return (list(theta.values()), list(theta_p.values()), list(chi.values()))
+    return (list(dict(sorted(theta.items())).values()), list(dict(sorted(theta_p.items())).values()), list(dict(sorted(chi.items())).values()))
 
 
 def __clingo_solve(encoding, n_models=1):
