@@ -1,4 +1,4 @@
-import clingo
+import click
 from clingo.control import Control
 import re
 
@@ -79,19 +79,43 @@ def __parse_answer_set(answer_set):
     return (list(theta.values()), list(theta_p.values()), list(chi.values()))
 
 
-def __clingo_solve(encoding):
-    ctl = Control(['-Wnone'])
+def __clingo_solve(encoding, n_models=1):
+    ctl = Control(['-Wnone', '--opt-mode=optN'])
     ctl.add(encoding)
     ctl.ground([("base", [])])
     answer_set = None
+    cost = None
+    opt_models = 0
     def on_model(model):
-        nonlocal answer_set
-        answer_set = __parse_answer_set(model)
+        nonlocal answer_set, cost, opt_models
+        prev_cost = cost
+        cost = model.cost
+        if prev_cost == cost:
+            opt_models += 1
+            theta, theta_p, chi  = __parse_answer_set(model)
+            answer_set = theta, theta_p, chi
+            print(f"SOLUTION (cost {cost}):")
+            print("Theta:")
+            print(__cnf_to_str(theta))
+            print("Theta':")
+            print(__cnf_to_str(theta_p))
+            print("Chi':")
+            print(__cnf_to_str(chi))
+            # print("Model:")
+            # print(model.symbols(shown=True))
+            print()
+
+        if n_models > 0 and opt_models >= n_models:
+            ctl.interrupt()
+        
+
     ctl.solve(on_model=on_model)
 
     return answer_set
 
-def main():
+@click.command()
+@click.option('-n', '--n_solutions', default=1, help='Number of produced explanations. (default 1 use 0 for all)', type=int)
+def main(n_solutions):
     fact_str = input("Fact Formula:\n")
     foil_str = input("Foil Formula:\n")
 
@@ -104,13 +128,8 @@ def main():
     with open(ENC_PATH, "r") as f:
         encoding += f.read()
     
-    theta, theta_p, chi = __clingo_solve(encoding)
-    print("Theta:")
-    print(__cnf_to_str(theta))
-    print("Theta':")
-    print(__cnf_to_str(theta_p))
-    print("Chi':")
-    print(__cnf_to_str(chi))
+    theta, theta_p, chi = __clingo_solve(encoding, n_models=n_solutions)
+    
 
 
 
