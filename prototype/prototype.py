@@ -2,8 +2,15 @@ import click
 from clingo.control import Control
 import re
 
-# ENC_PATH = "enc.lp"
-ENC_PATH = "enc_v2.lp"
+ENC_PATH_V1 = "enc.lp"
+
+ENC_PATH_V3 = "enc_v3.lp"
+
+ENC_PATH = {
+    1: "enc_v1.lp",
+    2: "enc_v2.lp",
+    3: "enc_v3.lp"
+}
 
 def __parse_cnf(str):
     cnf = []
@@ -93,7 +100,7 @@ def __parse_answer_set(answer_set):
 
 
 def __clingo_solve(encoding, n_models=1):
-    ctl = Control(['-Wnone', '--opt-mode=optN'])
+    ctl = Control(['-Wnone', '--opt-mode=optN', '-t4'])
     ctl.add(encoding)
     ctl.ground([("base", [])])
     answer_set = None
@@ -128,8 +135,9 @@ def __clingo_solve(encoding, n_models=1):
     return answer_set
 
 @click.command()
+@click.option('-v', '--version', default=1, help='The version of the definition to use. (from 1 to 3, default 1)', type=int)
 @click.option('-n', '--n_solutions', default=1, help='Number of produced explanations. (default 1 use 0 for all)', type=int)
-def main(n_solutions):
+def main(version, n_solutions):
     fact_str = input("Fact Formula:\n")
     foil_str = input("Foil Formula:\n")
 
@@ -139,7 +147,7 @@ def main(n_solutions):
     print()
 
     encoding = "".join(__cnf_to_facts(fact,foil))
-    with open(ENC_PATH, "r") as f:
+    with open(ENC_PATH[version], "r") as f:
         encoding += f.read()
     
     theta, theta_p, chi, chi_p = __clingo_solve(encoding, n_models=n_solutions)

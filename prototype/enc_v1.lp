@@ -3,20 +3,20 @@ atom(A) :- lit(_,A,_).
 #const n_clauses = 5.
 
 theta_cl(1..n_clauses).
-theta'_cl(1..n_clauses).
+theta_p_cl(1..n_clauses).
 chi_cl(1..n_clauses).
 
 % guess
 { theta_lit(C,A,t)  ; theta_lit(C,A,f)  } <= 1 :- theta_cl(C), atom(A).
-{ theta'_lit(C,A,t) ; theta'_lit(C,A,f) } <= 1 :- theta'_cl(C), atom(A).
+{ theta_p_lit(C,A,t) ; theta_p_lit(C,A,f) } <= 1 :- theta_p_cl(C), atom(A).
 { chi_lit(C,A,t)    ; chi_lit(C,A,f)    } <= 1 :- chi_cl(C), atom(A).
 
 theta_cl_empty(C) :- theta_cl(C), not theta_lit(C,_,_).
-theta'_cl_empty(C) :- theta'_cl(C), not theta'_lit(C,_,_).
+theta_p_cl_empty(C) :- theta_p_cl(C), not theta_p_lit(C,_,_).
 chi_cl_empty(C) :- chi_cl(C), not chi_lit(C,_,_).
 
 :- theta_cl_empty(C1), theta_cl(C2), C2 > C1, theta_lit(C2,_,_).
-:- theta'_cl_empty(C1), theta'_cl(C2), C2 > C1, theta'_lit(C2,_,_).
+:- theta_p_cl_empty(C1), theta_p_cl(C2), C2 > C1, theta_p_lit(C2,_,_).
 :- chi_cl_empty(C1), chi_cl(C2), C2 > C1, chi_lit(C2,_,_).
 
 % theta & chi equiv fact & -foil
@@ -77,20 +77,20 @@ cm1(A,f) :- u, atom(A).
 % :- not cm1(p4,t).
 
 
-% theta' & chi equiv -fact & foil
+% theta_p & chi equiv -fact & foil
 
 % guess countermodel
 cm2(A,t) | cm2(A,f) :- atom(A).
 v :- cm2(A,V1), cm2(A,V2), V1 != V2.
 
 % check theta
-theta_cl_sat2(C) :- theta'_cl_empty(C).
-theta_cl_sat2(C) :- theta'_cl(C), theta'_lit(C,A,V), cm2(A,V).
-theta_cl_viol2(C) :- theta'_cl(C), not theta'_cl_empty(C),
-                                   cm2(A,f) : theta'_lit(C,A,t);
-                                   cm2(A,t) : theta'_lit(C,A,f).
+theta_cl_sat2(C) :- theta_p_cl_empty(C).
+theta_cl_sat2(C) :- theta_p_cl(C), theta_p_lit(C,A,V), cm2(A,V).
+theta_cl_viol2(C) :- theta_p_cl(C), not theta_p_cl_empty(C),
+                                   cm2(A,f) : theta_p_lit(C,A,t);
+                                   cm2(A,t) : theta_p_lit(C,A,f).
 
-theta_sat2 :- theta_cl_sat2(C) : theta'_cl(C).
+theta_sat2 :- theta_cl_sat2(C) : theta_p_cl(C).
 theta_viol2 :- theta_cl_viol2(C).
 
 % check chi
@@ -134,13 +134,12 @@ cm2(A,f) :- v, atom(A).
 
 % size
 :~ theta_lit(C,A,V). [1@2,C,A,theta]
-:~ theta'_lit(C,A,V). [1@2,C,A,theta']
-% :~ chi_lit(C,A,V). [1@2,C,A,chi]
-:~ chi_lit(C,A,V). [2@2,C,A,chi]
-:~ chi_lit(C,A,V). [-1@1,C,A,chi]
+:~ theta_p_lit(C,A,V). [1@2,C,A,theta_p]
+:~ chi_lit(C,A,V). [1@2,C,A,chi]
+:~ chi_lit(C,A,V). [-1@1,C,A,chi_max]
 
 
 #show theta_lit/3.
-#show theta'_lit/3.
+#show theta_p_lit/3.
 #show chi_lit/3.
 
