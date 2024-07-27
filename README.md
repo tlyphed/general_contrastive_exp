@@ -14,8 +14,13 @@ pip install click clingo
 
 The script can then be run with
 ```
-python prototype.py -n <number of explanations>
+python prototype.py -v <version of the definition> -n <number of explanations>
 ```
+The options for `v` effect mostly the optimization. However `3` also introduces $\chi'$. The options are
+* `1`: minimize $\mathit{size}(\theta)+\mathit{size}(\theta')+\mathit{size}(\chi)$
+* `2`: minimize $\mathit{size}(\theta \land \chi)+\mathit{size}(\theta'\land \chi)$
+* `3`: minimize $\mathit{size}(\theta \land \chi)+\mathit{size}(\theta'\land \chi')$
+
 The default for `n` is one and passing zero produces all explanations.
 
 Example usage:
