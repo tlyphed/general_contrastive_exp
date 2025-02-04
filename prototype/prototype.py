@@ -1,15 +1,11 @@
 import click
 from clingo.control import Control
-import re
 
-ENC_PATH_V1 = "enc.lp"
 
-ENC_PATH_V3 = "enc_v3.lp"
-
-ENC_PATH = {
-    1: "enc_v1.lp",
-    2: "enc_v2.lp",
-    3: "enc_v3.lp"
+ENC = {
+    "GLOBAL_CE" : "enc_def3.lp",
+    "CF_CE"     : "enc_def5.lp",
+    "CF_DIFF"   : "enc_def6.lp"
 }
 
 def __parse_cnf(str):
@@ -26,9 +22,15 @@ def __parse_cnf(str):
     
     return cnf
 
-def __cnf_to_facts(fact_cnf,foil_cnf):
+def __cnf_to_facts(instance_cnf,fact_cnf,foil_cnf):
     facts = []
     i = 1
+    for cl in instance_cnf:
+        facts.append(f"instance_cl({i}).")
+        for l,t in cl:
+            sign = "t" if t else "f"
+            facts.append(f"lit({i},{l},{sign}).")
+        i += 1
     for cl in fact_cnf:
         facts.append(f"fact_cl({i}).")
         for l,t in cl:
@@ -58,7 +60,6 @@ def __parse_answer_set(answer_set):
     theta = {}
     theta_p = {}
     chi = {}
-    chi_p = {}
     for sym in answer_set.symbols(shown=True):
         if sym.match('theta_lit',3):
             c = sym.arguments[0].number
@@ -84,19 +85,11 @@ def __parse_answer_set(answer_set):
             if c not in chi:
                 chi[c] = []
             chi[c].append((l,s == "t"))
-        elif sym.match('chi_p_lit',3):
-            c = sym.arguments[0].number
-            l = str(sym.arguments[1])
-            s = str(sym.arguments[2])
 
-            if c not in chi_p:
-                chi_p[c] = []
-            chi_p[c].append((l,s == "t"))
     
     return (list(dict(sorted(theta.items())).values()), 
             list(dict(sorted(theta_p.items())).values()), 
-            list(dict(sorted(chi.items())).values()), 
-            list(dict(sorted(chi_p.items())).values()))
+            list(dict(sorted(chi.items())).values()))
 
 
 def __clingo_solve(encoding, n_models=1):
@@ -112,8 +105,8 @@ def __clingo_solve(encoding, n_models=1):
         cost = model.cost
         if prev_cost == cost:
             opt_models += 1
-            theta, theta_p, chi, chi_p  = __parse_answer_set(model)
-            answer_set = theta, theta_p, chi, chi_p
+            theta, theta_p, chi  = __parse_answer_set(model)
+            answer_set = theta, theta_p, chi
             print(f"SOLUTION (cost {cost}):")
             print("Theta:")
             print(__cnf_to_str(theta))
@@ -121,10 +114,6 @@ def __clingo_solve(encoding, n_models=1):
             print(__cnf_to_str(theta_p))
             print("Chi:")
             print(__cnf_to_str(chi))
-            print("Chi':")
-            print(__cnf_to_str(chi_p))
-            # print("Model:")
-            # print(model.symbols(shown=True))
             print()
 
         if n_models > 0 and opt_models >= n_models:
@@ -135,22 +124,30 @@ def __clingo_solve(encoding, n_models=1):
     return answer_set
 
 @click.command()
-@click.option('-v', '--version', default=1, help='The version of the definition to use. (from 1 to 3, default 1)', type=int)
+@click.option('-p', '--problem', default='GLOBAL_CE', help='The the problem definition to use. (default: GLOBAL_CE)', type=click.Choice(['GLOBAL_CE', 'CF_CE', 'CF_DIFF'], case_sensitive=False))
 @click.option('-n', '--n_solutions', default=1, help='Number of produced explanations. (default 1 use 0 for all)', type=int)
-def main(version, n_solutions):
+def main(problem, n_solutions):
+    problem = problem.upper()
+
+    if problem != 'GLOBAL_CE':
+        instance_str = input("Instance Formula:\n")
+        instance = __parse_cnf(instance_str)
+    else:
+        instance = []
     fact_str = input("Fact Formula:\n")
     foil_str = input("Foil Formula:\n")
 
+    
     fact = __parse_cnf(fact_str)
     foil = __parse_cnf(foil_str)
 
     print()
 
-    encoding = "".join(__cnf_to_facts(fact,foil))
-    with open(ENC_PATH[version], "r") as f:
+    encoding = "".join(__cnf_to_facts(instance,fact,foil))
+    with open(ENC[problem], "r") as f:
         encoding += f.read()
     
-    theta, theta_p, chi, chi_p = __clingo_solve(encoding, n_models=n_solutions)
+    __clingo_solve(encoding, n_models=n_solutions)
     
 
 
