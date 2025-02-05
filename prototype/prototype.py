@@ -92,8 +92,8 @@ def __parse_answer_set(answer_set):
             list(dict(sorted(chi.items())).values()))
 
 
-def __clingo_solve(encoding, n_models=1):
-    ctl = Control(['-Wnone', '--opt-mode=optN', '-t4'])
+def __clingo_solve(encoding, n_models=1, max_clauses=5):
+    ctl = Control(['-Wnone', '--opt-mode=optN', '-t4', f'-c n_clauses={max_clauses}'])
     ctl.add(encoding)
     ctl.ground([("base", [])])
     answer_set = None
@@ -125,8 +125,9 @@ def __clingo_solve(encoding, n_models=1):
 
 @click.command()
 @click.option('-p', '--problem', default='GLOBAL_CE', help='The the problem definition to use. (default: GLOBAL_CE)', type=click.Choice(['GLOBAL_CE', 'CF_CE', 'CF_DIFF'], case_sensitive=False))
+@click.option('-m', '--max_clauses', default=5, help='Max Number of clauses in the produced explanation formulas. (default 5)', type=int)
 @click.option('-n', '--n_solutions', default=1, help='Number of produced explanations. (default 1 use 0 for all)', type=int)
-def main(problem, n_solutions):
+def main(problem, max_clauses, n_solutions):
     problem = problem.upper()
 
     if problem != 'GLOBAL_CE':
@@ -147,7 +148,7 @@ def main(problem, n_solutions):
     with open(ENC[problem], "r") as f:
         encoding += f.read()
     
-    __clingo_solve(encoding, n_models=n_solutions)
+    __clingo_solve(encoding, n_models=n_solutions, max_clauses=max_clauses)
     
 
 
