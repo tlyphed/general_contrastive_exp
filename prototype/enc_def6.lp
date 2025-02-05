@@ -1,4 +1,4 @@
-#const n_clauses = 3.
+#const n_clauses = 5.
 
 atom(A) :- lit(_,A,_).
 
