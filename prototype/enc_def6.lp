@@ -1,4 +1,6 @@
+truth_val(t;f).
 #const n_clauses = 5.
+#const n_lits = 3.
 
 atom(A) :- lit(_,A,_).
 
@@ -7,9 +9,14 @@ theta_p_cl(1..n_clauses).
 chi_cl(1..n_clauses).
 
 % guess
-{ theta_lit(C,A,t)   ; theta_lit(C,A,f)   } <= 1 :- theta_cl(C), atom(A).
-{ theta_p_lit(C,A,t) ; theta_p_lit(C,A,f) } <= 1 :- theta_p_cl(C), atom(A).
-{ chi_lit(C,A,t)     ; chi_lit(C,A,f)     } <= 1 :- chi_cl(C), atom(A).
+{ theta_lit(C,A,T) : atom(A), truth_val(T)   } <= n_lits :- theta_cl(C).
+{ theta_p_lit(C,A,T) : atom(A), truth_val(T) } <= n_lits :- theta_p_cl(C).
+{ chi_lit(C,A,T) : atom(A), truth_val(T)  }    <= n_lits :- chi_cl(C).
+
+% no contradictions
+:- theta_lit(C,A,T1), theta_lit(C,A,T2), T1 != T2.
+:- theta_p_lit(C,A,T1), theta_p_lit(C,A,T2), T1 != T2.
+:- chi_lit(C,A,T1), chi_lit(C,A,T2), T1 != T2.
 
 theta_cl_empty(C) :- theta_cl(C), not theta_lit(C,_,_).
 theta_p_cl_empty(C) :- theta_p_cl(C), not theta_p_lit(C,_,_).
@@ -162,3 +169,15 @@ chi_satisfiable :- chi_cl_satisfiable(C) : chi_cl(C).
 #show theta_p_lit/3.
 #show chi_lit/3.
 
+
+
+% :- not chi_lit(1,beak_pouch,f). 
+% :- not chi_lit(1,small,f). 
+% :- not chi_lit(2,white_body,t). 
+% :- not chi_lit(3,webbed_feet,t). 
+% :- not chi_lit(4,grey_wing,f).
+
+
+% :- not theta_p_lit(1,small,t).
+
+% :- not theta_lit(1,beak_pouch,t).
