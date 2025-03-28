@@ -34,7 +34,7 @@ cm1(A,t) | cm1(A,f) :- atom(A).
 u :- cm1(A,V1), cm1(A,V2), V1 != V2.
 
 % cm violates theta & chi -> saturate
-theta_cl_viol(C) :- theta_p_cl(C), not theta_cl_empty(C),
+theta_cl_viol(C) :- theta_cl(C), not theta_cl_empty(C),
                     cm1(A,f) : theta_lit(C,A,t);
                     cm1(A,t) : theta_lit(C,A,f).
 chi_cl_viol(C) :- chi_cl(C), not chi_cl_empty(C),
