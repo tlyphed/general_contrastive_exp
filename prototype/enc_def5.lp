@@ -144,6 +144,7 @@ cm3(A,f) :- w, atom(A).
 % theta' & chi is sat
 
 { model(A,t) ; model(A,f) } = 1 :- atom(A).
+
 theta_p_cl_satisfiable(C) :- theta_p_cl_empty(C).
 theta_p_cl_satisfiable(C) :- theta_p_cl(C), theta_p_lit(C,A,V), model(A,V).
 theta_p_satisfiable :- theta_p_cl_satisfiable(C) : theta_p_cl(C).
