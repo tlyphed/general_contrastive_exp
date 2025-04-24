@@ -19,10 +19,6 @@ chi_cl(1..n_clauses).
 :- theta_p_lit(C,A,T1), theta_p_lit(C,A,T2), T1 != T2.
 :- chi_lit(C,A,T1), chi_lit(C,A,T2), T1 != T2.
 
-% no redundant literals
-:- theta_lit(C1,A,T1), theta_lit(C2,A,T2), C1 != C2, T1 != T2.
-:- theta_p_lit(C1,A,T1), theta_p_lit(C2,A,T2), C1 != C2, T1 != T2.
-:- chi_lit(C1,A,T1), chi_lit(C2,A,T2), C1 != C2, T1 != T2.
 
 % sym breaking
 theta_cl_min_atom(C,A) :- theta_cl(C), atom(A), A = #min{ A' : theta_lit(C,A',_) }.
