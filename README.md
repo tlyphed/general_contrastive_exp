@@ -14,7 +14,7 @@ pip install click clingo
 
 The script can then be run with
 ```
-python prototype.py -p <problem definition> -n <number of explanations>
+python prototype.py -p <problem definition> -n <number of explanations> -m <max num of clauses> -k <max num of literals>
 ```
 The options for `p` are the different problems from the draft. The options are
 * `GLOBAL_CE`: Definition 3
